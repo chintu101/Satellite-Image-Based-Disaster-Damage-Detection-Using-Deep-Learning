@@ -68,7 +68,12 @@ class DamageAssessor:
         self.model = SiameseUNet().to(self.device)
         
         try:
-            self.model.load_state_dict(torch.load('model.pth', map_location=self.device, weights_only=False))
+            checkpoint = torch.load('model.pth', map_location=self.device, weights_only=False)
+            if isinstance(checkpoint, dict):
+                self.model.load_state_dict(checkpoint)
+            else:
+                # File was saved as full model, extract state dict
+                self.model.load_state_dict(checkpoint.state_dict())
             print("✅ Real AI Model weights loaded successfully!")
         except Exception as e:
             print(f"⚠️ Could not load weights: {e}")
